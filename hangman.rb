@@ -4,4 +4,5 @@ def read_in_dictionary(dictionary_file_path)
   nil
 end
 
-puts read_in_dictionary('stuf').length
+wordList = read_in_dictionary(dictionaryFileName).select {|word|  word.length.between?(5,12)}
+puts wordList.length
