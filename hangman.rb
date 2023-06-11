@@ -5,4 +5,5 @@ def read_in_dictionary(dictionary_file_path)
 end
 
 wordList = read_in_dictionary(dictionaryFileName).select {|word|  word.length.between?(5,12)}
-puts wordList.length
+secret_word = wordList[rand(wordList.length)]
+puts secret_word
