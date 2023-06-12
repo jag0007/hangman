@@ -31,6 +31,7 @@ class HangmanGame
         @model.make_guess(guess)
       end
     end
+    @view.show_result(@model.get_game_result, @model.secret_word)
   end
 end
 
@@ -57,6 +58,11 @@ class HangmanModel
       end
     end
   end
+
+def get_game_result
+  return "Win" if self.secret_word == self.uncovered_word
+  return "Lose" if self.guesses_remaining == 0
+end
 
   def already_guessed?(guess)
     self.guessed_letters.include?(guess)
@@ -94,6 +100,11 @@ class HangmanView
     print "Letters Guessed: "
     game_model.guessed_letters.each { |letter| print " #{letter}" }
     puts "\nBad Guesses Remaining: #{game_model.guesses_remaining}"
+  end
+
+  def show_result(result, word)
+    puts "You #{result}"
+    puts "The Secret Word is #{word}"
   end
 end
 
