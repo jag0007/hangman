@@ -20,15 +20,26 @@ class Hangman
   def play(word)
     @model.initialize_game(word)
     @view.show_instructions(word.length)
+    until @model.game_over?
+      @model.guesses_remaining -= 1
+      #@model.make_guess(@view.get_player_guess)
+    end
   end
 end
 
 class HangmanModel
-  attr_accessor :secret_word
+  attr_accessor :secret_word, :uncovered_word, :guesses_remaining
+  
 
   def initialize_game(word)
-    secret_word = word
+    self.secret_word = word
+    self.guesses_remaining = 5
+    self.uncovered_word = word.gsub(/[a-z]/, "_")
   end 
+
+  def game_over?
+    return self.secret_word == self.uncovered_word || self.guesses_remaining == 0 
+  end
 end
 
 class HangmanView
