@@ -11,7 +11,7 @@ class WordGenerator
   end
 end
 
-class Hangman
+class HangmanGame
   def initialize(model, view)
     @model = model
     @view = view
@@ -21,25 +21,51 @@ class Hangman
     @model.initialize_game(word)
     @view.show_instructions(word.length)
     until @model.game_over?
-      @model.guesses_remaining -= 1
-      #@model.make_guess(@view.get_player_guess)
+      @view.show_game_state(@model)
+      guess = @view.get_player_guess
+      if !@model.valid_input?(guess)
+        @view.invalid_input
+      elsif @model.already_guessed?(guess) 
+        @view.already_guessed
+      else
+        @model.make_guess(guess)
+      end
     end
   end
 end
 
 class HangmanModel
-  attr_accessor :secret_word, :uncovered_word, :guesses_remaining
+  attr_accessor :secret_word, :uncovered_word, :guesses_remaining, :guessed_letters
   
-
   def initialize_game(word)
     self.secret_word = word
     self.guesses_remaining = 5
     self.uncovered_word = word.gsub(/[a-z]/, "_")
+    self.guessed_letters = []
   end 
 
   def game_over?
     return self.secret_word == self.uncovered_word || self.guesses_remaining == 0 
   end
+
+  def make_guess(letter)
+    self.guessed_letters.push(letter)
+    self.guesses_remaining -= 1 unless secret_word.include?(letter)
+    self.secret_word.each_char.with_index do |char, index|
+      if char == letter
+        uncovered_word[index] = letter
+      end
+    end
+  end
+
+  def already_guessed?(guess)
+    self.guessed_letters.include?(guess)
+  end
+
+  def valid_input?(guess)
+    guess.match?("[a-z]") && guess.length == 1
+  end
+
 end
 
 class HangmanView
@@ -49,6 +75,26 @@ class HangmanView
     puts "If you are right, the secret word will reveal where the letter belongs."
     puts "The secret word is #{word_length} letters long."
   end
+
+  def get_player_guess
+    print "What's your guess? "
+    guess = gets.chomp.downcase
+  end
+
+  def invalid_input
+    puts "Input invalid. Try again."
+  end
+
+  def already_guessed
+    puts "You've already guess that letter. Try again."
+  end
+
+  def show_game_state(game_model)
+    puts "\nSecret Word: #{game_model.uncovered_word}"
+    print "Letters Guessed: "
+    game_model.guessed_letters.each { |letter| print " #{letter}" }
+    puts "\nBad Guesses Remaining: #{game_model.guesses_remaining}"
+  end
 end
 
 #secret_word = WordGenerator.get_random_word(dictionaryFileName, {min: 5, max: 12})
@@ -56,6 +102,6 @@ end
 #secret_word.each_char {|char| print "_" }
 
 dictionaryFileName = "google-10000-english-no-swears.txt"
-game = Hangman.new(HangmanModel.new, HangmanView.new)
+game = HangmanGame.new(HangmanModel.new, HangmanView.new)
 game.play(WordGenerator.get_random_word(dictionaryFileName, {min: 5, max: 12}))
 
