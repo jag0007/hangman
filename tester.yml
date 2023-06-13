@@ -1,0 +1,7 @@
+---
+:secret_word: test
+:guesses_remaining: 5
+:uncovered_word: __st
+:guessed_letters:
+- s
+- t
